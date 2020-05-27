@@ -1,0 +1,9 @@
+- name: Update nptdate
+  block:
+    - name: Install ntpdate
+      yum:
+        name: ['ntpdate']
+        state: present
+    - name: Update utp time
+      shell: "/usr/sbin/ntpdate -u -s {{ ntpip }} && hwclock --systohc"
+  when: (ntpip is not undefined)

@@ -1,0 +1,11 @@
+- name: Copy Addon
+  template:
+    src: "{{ item }}"
+    dest: "/root/{{ item }}"
+  with_items:
+    - flannel.yaml
+    - app.yaml
+- name: Deploy Flannel
+  shell: "kubectl apply -f /root/flannel.yaml"
+- name: Deploy App
+  shell: "kubectl apply -f /root/app.yaml"

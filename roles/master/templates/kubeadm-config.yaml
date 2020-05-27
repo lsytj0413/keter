@@ -1,0 +1,11 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: v1.17.3
+controlPlaneEndpoint: "{{ groups['masters'][0] }}:6443"
+imageRepository: registry.cn-hangzhou.aliyuncs.com/google_containers
+apiServer:
+  certSANs:
+  - "{{ groups['masters'][0] }}"
+  - "127.0.0.1"
+networking:
+  podSubnet: 10.244.0.0/16

@@ -1,0 +1,38 @@
+- name: Close SELinux
+  raw: setenforce 0 && sed -i 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
+- name: Close firewall
+  systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: False
+  with_items:
+    - firewalld
+  ignore_errors: False
+- name: Close swap
+  raw: swapoff -a
+- name: Write Bridge IP6 Configuration file
+  template:
+    src: "kubernetes.conf"
+    dest: /etc/sysctl.d/kubernetes.conf
+- name: Enable Bridge IP6 Configuration
+  shell: "sysctl --system"
+- name: Update yum repo
+  template:
+    src: "{{ item }}"
+    dest: "/etc/yum.repos.d/{{ item }}"
+  with_items:
+    - kubernetes.repo
+    - CentOS-Base.repo
+    - docker-ce.repo
+- name: Install Kubernetes Component
+  yum:
+    name: ['docker-ce', 'kubelet-1.17.3', 'kubectl-1.17.3', 'kubeadm-1.17.3']
+    state: present
+- name: Enable Kubernetes Component
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: True
+  with_items:
+    - docker
+    - kubelet

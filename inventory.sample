@@ -1,0 +1,6 @@
+[masters]
+10.200.13.19 ansible_ssh_host=10.200.13.19 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=xxx
+
+[nodes]
+10.200.13.20 ansible_ssh_host=10.200.13.20 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=xxx
+10.200.13.21 ansible_ssh_host=10.200.13.21 ansible_ssh_port=22 ansible_ssh_user=root ansible_ssh_pass=xxx

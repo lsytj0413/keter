@@ -1,0 +1,13 @@
+- name: Ensure interpreter does exists
+  gather_facts: no
+  hosts: "{{ HOSTS|default('all') }}"
+  any_errors_fatal: true
+  tasks:
+    - name: Try to use python3 if python does not exist
+      raw: test -e /usr/bin/python || ln -s /usr/bin/python3 /usr/bin/python
+    - name: Gather fact
+      setup:
+    - name: Set ansible_python_interpreter
+      set_fact:
+        ansible_python_interpreter: /usr/bin/python3
+      when: ansible_distribution | lower == "ubuntu"

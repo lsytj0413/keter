@@ -1,0 +1,6 @@
+- name: Close Flannel Checksum
+  shell: "ethtool -K flannel.1 tx-checksum-ip-generic off"
+  register: result
+  until: result is success
+  retries: 5
+  delay: 10

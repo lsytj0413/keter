@@ -1,0 +1,44 @@
+- name: Copy ClusterConfiguration
+  template:
+    src: "{{ item }}"
+    dest: "/root/{{ item }}"
+  with_items:
+    - kubeadm-config.yaml
+- name: Pull Images
+  shell: "kubeadm config images pull --config /root/kubeadm-config.yaml"
+- name: Install First Control-Plane Node
+  shell: "kubeadm init --config=/root/kubeadm-config.yaml --upload-certs"
+  register: results
+- name: Output kubeadm init results
+  debug:
+    var: results.stdout
+- name: Ensure kubeconfig dir exists
+  file:
+    name: "~/.kube"
+    state: directory
+- name: Copy kubeconfig
+  shell: "cp /etc/kubernetes/admin.conf ~/.kube/config"
+- name: Search Token String
+  set_fact:
+    kubeadm_token: "{{ results.stdout | regex_search(regexp, '\\2', multiline=True) | first }}"
+  vars:
+    regexp: '(--token)\s([\w]{6}\.[\w]+)'
+- name: Output token string
+  debug:
+    var: kubeadm_token
+- name: Search Token Hash String
+  set_fact:
+    kubeadm_token_hash: "{{ results.stdout | regex_search(regexp, '\\2', multiline=True) | first }}"
+  vars:
+    regexp: '(-hash\s)(sha256:[\w]+)'
+- name: Output token hash string
+  debug:
+    var: kubeadm_token_hash
+- name: Search Certificate Key String
+  set_fact:
+    kubeadm_certificate_key: "{{ results.stdout | regex_search(regexp, '\\2', multiline=True) | first }}"
+  vars:
+    regexp: '(-key\s)([\w]+)'
+- name: Output Certificate Key String
+  debug:
+    var: kubeadm_certificate_key

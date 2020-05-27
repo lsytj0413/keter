@@ -1,0 +1,57 @@
+- name: Ensure interpreter does exists
+  import_playbook: common/interpreter.yml
+
+- name: Prepare machine for install kubernetes
+  hosts: all
+  any_errors_fatal: True
+  tasks:
+    - name: Prepare machine system config
+      import_role:
+        name: common
+        tasks_from: update_system_config.yml
+
+- name: Prepare ntpdate
+  hosts: all
+  any_errors_fatal: True
+  tasks:
+    - name: Prepare ntpdate
+      import_role:
+        name: common
+        tasks_from: ntp.yml
+
+- name: Install Master Nodes
+  hosts: masters
+  any_errors_fatal: True
+  tasks:
+    - name: Install First Control-Plane Node
+      import_role:
+        name: master
+        tasks_from: init.yml
+
+- name: Install Worker Nodes
+  hosts: nodes
+  any_errors_fatal: True
+  tasks:
+    - name: Install Worker Nodes
+      import_role:
+        name: node
+        tasks_from: join.yml
+
+- name: Deploy Addon
+  hosts: masters
+  any_errors_fatal: True
+  tasks:
+    - name: Install Addon
+      import_role:
+        name: addons
+        tasks_from: deploy.yml
+      run_once: True
+
+- name: Close Flannel Checksum
+  hosts: all
+  any_errors_fatal: True
+  tasks:
+    - name: Close Flannel Checksum
+      import_role:
+        name: common
+        tasks_from: flannel_checksum.yml

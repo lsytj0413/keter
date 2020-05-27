@@ -2,17 +2,19 @@ FROM python:3.8.3
 
 LABEL author=lsytj0413@gmail.com
 
-COPY Pipfile.lock Pipfile /keter/
+COPY Pipfile.lock Pipfile ansible.cfg inventory.sample playbooks roles /keter/
 WORKDIR /keter
 RUN pip install -i https://mirrors.aliyun.com/pypi/simple pipenv \
     && export PIPENV_VENV_IN_PROJECT=1 \
     && pipenv install --pypi-mirror https://mirrors.aliyun.com/pypi/simple \
     && sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list \
     && apt update \
-    && apt install -y openssh-client sshpass --no-install-recommends \
+    && apt install -y openssh-client sshpass vim --no-install-recommends \
     && rm -rf /var/lib/apt/lists \
     && echo 'source /keter/.venv/bin/activate' >> /root/.bashrc
 
 ENV PATH=/keter/.venv/bin:$PATH 
+ENV ANSIBLE_HOST_KEY_CHECKING=False
+ENV ANSIBLE_SSH_COMMON_ARGS='-o UserKnownHostsFile=/dev/null'
 
 CMD ["/bin/bash"]

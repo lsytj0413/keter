@@ -1,0 +1,13 @@
+- name: Set Hosts Fact
+  set_fact:
+    kubeadm_token: "{{ hostvars[groups['masters'][0]]['kubeadm_token'] }}"
+    kubeadm_token_hash: "{{ hostvars[groups['masters'][0]]['kubeadm_token_hash'] }}"
+- name: Output Token
+  vars:
+    msg: |
+      Kubeadm Token: {{ kubeadm_token }}
+      Kubeadm Token Hash: {{ kubeadm_token_hash }}
+  debug:
+    var: msg
+- name: Join Worker Node
+  shell: "kubeadm join {{ groups['masters'][0] }}:6443 --token {{ kubeadm_token }} --discovery-token-ca-cert-hash {{ kubeadm_token_hash }}"
